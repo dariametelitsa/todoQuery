@@ -43,7 +43,7 @@ export function TodoList() {
     <>
       <h1>Todolist</h1>
       {data?.map((task) => (
-        <div key={task.id}>
+        <div key={task.id} className={'m-4'}>
           <input type={'checkbox'} defaultChecked={task.done} />
           {task.text}
         </div>
