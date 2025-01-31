@@ -1,39 +1,34 @@
 import { useQuery } from '@tanstack/react-query';
+import { todoListApi } from './api.ts';
 
-type Todo = {
-  id: string;
-  text: string;
-  done: boolean;
-};
-
-export const getTasks = () => {
-  return new Promise<Todo[]>((res) => {
-    setTimeout(() => {
-      res([
-        {
-          id: '1',
-          text: 'React',
-          done: true,
-        },
-        {
-          id: '2',
-          text: 'JS',
-          done: true,
-        },
-        {
-          id: '3',
-          text: 'Tanstack',
-          done: false,
-        },
-      ]);
-    }, 1000);
-  });
-};
+// export const getTasks = () => {
+//   return new Promise<TodoDto[]>((res) => {
+//     setTimeout(() => {
+//       res([
+//         {
+//           id: '1',
+//           text: 'React',
+//           done: true,
+//         },
+//         {
+//           id: '2',
+//           text: 'JS',
+//           done: true,
+//         },
+//         {
+//           id: '3',
+//           text: 'Tanstack',
+//           done: false,
+//         },
+//       ]);
+//     }, 1000);
+//   });
+// };
 
 export function TodoList() {
   const { data, error, isPending } = useQuery({
     queryKey: ['tasks', 'list'],
-    queryFn: getTasks,
+    queryFn: todoListApi.getTodoList,
   });
 
   if (isPending) {
@@ -49,7 +44,7 @@ export function TodoList() {
       <h1>Todolist</h1>
       {data?.map((task) => (
         <div key={task.id}>
-          <input type={'checkbox'} checked={task.done} />
+          <input type={'checkbox'} defaultChecked={task.done} />
           {task.text}
         </div>
       ))}
