@@ -5,7 +5,7 @@ import { TodoList } from '../modules/todo-list/todo-list.tsx';
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TodoList></TodoList>
+      <TodoList />
     </QueryClientProvider>
   );
 }

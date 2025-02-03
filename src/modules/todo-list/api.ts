@@ -1,15 +1,30 @@
 const BASE_URL = 'http://localhost:3000';
 
-export type TodoDto = {
+type TodoDto = {
   id: string;
   text: string;
   done: boolean;
 };
 
+export type PaginatedResult<T> = {
+  data: T[];
+  first: number;
+  items: number;
+  last: number;
+  next: number | null;
+  pages: number;
+  prev: number | null;
+};
+
 export const todoListApi = {
-  getTodoList: ({ signal }: { signal: AbortSignal }) => {
-    return fetch(`${BASE_URL}/tasks`, { signal }).then((res) => {
-      return res.json() as Promise<TodoDto[]>;
+  getTodoList: async (
+    { page }: { page: number },
+    { signal }: { signal: AbortSignal }
+  ) => {
+    // const res = await fetch(`${BASE_URL}/tasks?_page=${page}&_per_page=10`, {
+    const res = await fetch(`${BASE_URL}/tasks?_page=${page}&_per_page=10`, {
+      signal,
     });
+    return (await res.json()) as Promise<PaginatedResult<TodoDto>>;
   },
 };
