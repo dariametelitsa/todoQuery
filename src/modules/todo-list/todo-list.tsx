@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { todoListApi } from './api.ts';
 import { useState } from 'react';
 
@@ -28,17 +28,25 @@ import { useState } from 'react';
 
 export function TodoList() {
   const [page, setPage] = useState(1);
+  const [enabled, setEnabled] = useState(false);
 
   const {
     error,
-    isPending,
     data: todoItems,
+    isPlaceholderData,
+    status,
+    fetchStatus,
+    isLoading,
   } = useQuery({
-    queryKey: ['tasks', 'list'],
+    queryKey: ['tasks', 'list', { page }],
     queryFn: (meta) => todoListApi.getTodoList({ page }, meta),
+    placeholderData: keepPreviousData,
+    enabled: enabled,
   });
 
-  if (isPending) {
+  console.log({ status, fetchStatus });
+
+  if (isLoading) {
     return <h1>Loading...</h1>;
   }
 
@@ -49,8 +57,18 @@ export function TodoList() {
   return (
     <div className={'max-w-[1200px] p-10 mx-auto'}>
       <h1 className={'text-3xl font-bold underline'}>Todolist</h1>
-      <div className={'m-4 flex flex-col gap-4'}>
-        {todoItems.data?.map((task) => (
+      <button
+        className={'p-3 border border-amber-400 rounded my-3'}
+        onClick={() => setEnabled((prev) => !prev)}
+      >
+        Toggle Enabled = {enabled ? 'true' : 'false'}
+      </button>
+      <div
+        className={
+          'm-4 flex flex-col gap-4' + (isPlaceholderData ? ' opacity-50' : '')
+        }
+      >
+        {todoItems?.data?.map((task) => (
           <div key={task.id} className={'border border-slate-300 rounded p-3'}>
             <input
               type={'checkbox'}
@@ -78,7 +96,7 @@ export function TodoList() {
             'p-3 rounded bg-blue-200 cursor-pointer hover:opacity-90 active:opacity-80'
           }
           onClick={() => {
-            setPage((p) => p + 1);
+            setPage((p) => Math.min(p + 1, todoItems?.pages ?? 1));
           }}
         >
           next
