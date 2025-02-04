@@ -1,33 +1,8 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { todoListApi } from './api.ts';
-import { useState } from 'react';
-
-// export const getTasks = () => {
-//   return new Promise<TodoDto[]>((res) => {
-//     setTimeout(() => {
-//       res([
-//         {
-//           id: '1',
-//           text: 'React',
-//           done: true,
-//         },
-//         {
-//           id: '2',
-//           text: 'JS',
-//           done: true,
-//         },
-//         {
-//           id: '3',
-//           text: 'Tanstack',
-//           done: false,
-//         },
-//       ]);
-//     }, 1000);
-//   });
-// };
+import { useCallback, useRef, useState } from 'react';
 
 export function TodoList() {
-  const [page, setPage] = useState(1);
   const [enabled, setEnabled] = useState(false);
 
   const {
@@ -37,11 +12,20 @@ export function TodoList() {
     status,
     fetchStatus,
     isLoading,
-  } = useQuery({
-    queryKey: ['tasks', 'list', { page }],
-    queryFn: (meta) => todoListApi.getTodoList({ page }, meta),
-    placeholderData: keepPreviousData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['tasks', 'list'],
+    queryFn: (meta) => todoListApi.getTodoList({ page: meta.pageParam }, meta),
+    initialPageParam: 1,
+    getNextPageParam: (res) => res.next,
     enabled: enabled,
+    select: (result) => result.pages.map((page) => page.data).flat(),
+  });
+
+  const cursorRef = useIntersection(() => {
+    fetchNextPage();
   });
 
   console.log({ status, fetchStatus });
@@ -68,7 +52,7 @@ export function TodoList() {
           'm-4 flex flex-col gap-4' + (isPlaceholderData ? ' opacity-50' : '')
         }
       >
-        {todoItems?.data?.map((task) => (
+        {todoItems?.map((task) => (
           <div key={task.id} className={'border border-slate-300 rounded p-3'}>
             <input
               type={'checkbox'}
@@ -79,29 +63,33 @@ export function TodoList() {
           </div>
         ))}
       </div>
-
-      <div className={'flex gap-5 w-full justify-center'}>
-        <button
-          className={
-            'p-3 rounded bg-blue-200 cursor-pointer hover:opacity-90 active:opacity-80'
-          }
-          onClick={() => {
-            setPage((p) => Math.max(p - 1, 1));
-          }}
-        >
-          prev
-        </button>
-        <button
-          className={
-            'p-3 rounded bg-blue-200 cursor-pointer hover:opacity-90 active:opacity-80'
-          }
-          onClick={() => {
-            setPage((p) => Math.min(p + 1, todoItems?.pages ?? 1));
-          }}
-        >
-          next
-        </button>
+      <div className={'flex gap-2 mt-4'} ref={cursorRef}>
+        {!hasNextPage && <div>No data</div>}
+        {isFetchingNextPage && <div>Loading...</div>}
       </div>
     </div>
+  );
+}
+
+export function useIntersection(onIntersect: () => void) {
+  const unsubscribe = useRef(() => {});
+
+  return useCallback(
+    (el: HTMLDivElement | null) => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((intersection) => {
+          if (intersection.isIntersecting) {
+            onIntersect();
+          }
+        });
+      });
+      if (el) {
+        observer.observe(el);
+        unsubscribe.current = () => observer.disconnect();
+      } else {
+        unsubscribe.current();
+      }
+    },
+    [onIntersect]
   );
 }
