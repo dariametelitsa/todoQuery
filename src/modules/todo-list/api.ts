@@ -1,4 +1,5 @@
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
+import { jsonApiInstance } from '../../shared/api/api-instance.ts';
 
 const BASE_URL = 'http://localhost:3000';
 
@@ -33,7 +34,7 @@ export const todoListApi = {
   getTodolistQueryOptions: ({ page }: { page: number }) => {
     return queryOptions({
       queryKey: ['tasks', 'list'],
-      queryFn: (meta) => todoListApi.getTodoList({ page }, meta),
+      queryFn: jsonApiInstance(`/tasks?_page=${page}&_per_page=10`),
     });
   },
 
