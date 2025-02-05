@@ -5,17 +5,21 @@ import { todoListApi } from './api.ts';
 import { nanoid } from 'nanoid';
 
 export function TodoList() {
-  const { error, cursor, isLoading, todoItems } = useTodolist();
+  const { error, refetch, isLoading, todoItems } = useTodolist();
 
   const createTodo = useMutation({
     mutationFn: todoListApi.createTodo,
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
     const title = String(formData.get('title') ?? '');
-    createTodo.mutate({ id: nanoid(), done: false, userId: '1', text: title });
+    createTodo.mutate(
+      { id: nanoid(), done: false, userId: '1', text: title },
+      { onSuccess: () => refetch() }
+    );
     e.currentTarget.reset();
   };
 
@@ -54,7 +58,6 @@ export function TodoList() {
           </div>
         ))}
       </div>
-      {cursor}
     </div>
   );
 }
