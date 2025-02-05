@@ -3,7 +3,7 @@ import { useCreateTodo } from './useCreateTodo.ts';
 
 export function TodoList() {
   const { error, isLoading, todoItems } = useTodolist();
-  const { handleSubmit } = useCreateTodo();
+  const createTodo = useCreateTodo();
 
   if (isLoading) {
     return <h1>Loading...</h1>;
@@ -17,13 +17,18 @@ export function TodoList() {
     <div className={'max-w-[1200px] p-10 mx-auto'}>
       <h1 className={'text-3xl font-bold underline'}>Todolist</h1>
 
-      <form className={'flex gap-2 my-3'} onSubmit={handleSubmit}>
+      <form className={'flex gap-2 my-3'} onSubmit={createTodo.onCreate}>
         <input
           type={'text'}
           name={'title'}
           className={'rounded p-2 border border-amber-300 mb-5'}
         />
-        <button className={'rounded p-2 border border-amber-300 mb-5'}>
+        <button
+          disabled={createTodo.isPending}
+          className={
+            'rounded p-2 border border-amber-300 mb-5 disabled:opacity-50'
+          }
+        >
           Create
         </button>
       </form>

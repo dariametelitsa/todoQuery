@@ -8,11 +8,13 @@ export const useCreateTodo = () => {
 
   const createTodo = useMutation({
     mutationFn: todoListApi.createTodo,
-    onSuccess: () =>
-      queryClient.invalidateQueries(todoListApi.getTodolistQueryOptions()),
+    onSettled: async () =>
+      await queryClient.invalidateQueries(
+        todoListApi.getTodolistQueryOptions()
+      ),
   });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onCreate = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
@@ -21,5 +23,5 @@ export const useCreateTodo = () => {
     e.currentTarget.reset();
   };
 
-  return { handleSubmit };
+  return { onCreate, isPending: createTodo.isPending };
 };
