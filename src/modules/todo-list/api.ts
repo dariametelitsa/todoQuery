@@ -52,14 +52,16 @@ export const todoListApi = {
       json: data,
     });
   },
+
   updateTodo: (id: string, data: Partial<TodoDto>) => {
     return jsonApiInstance<TodoDto>(`/tasks${id}`, {
       method: 'PATCH',
       json: data,
     });
   },
+
   deleteTodo: (id: string) => {
-    return jsonApiInstance<TodoDto>(`/tasks${id}`, {
+    return jsonApiInstance<TodoDto>(`/tasks/${id}`, {
       method: 'DELETE',
     });
   },
