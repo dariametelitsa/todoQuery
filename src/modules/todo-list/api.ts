@@ -19,9 +19,10 @@ export type PaginatedResult<T> = {
 };
 
 export const todoListApi = {
+  baseKey: 'tasks',
   getTodolistQueryOptions: () => {
     return queryOptions({
-      queryKey: ['tasks', 'list'],
+      queryKey: [todoListApi.baseKey, 'list'],
       queryFn: (meta) =>
         jsonApiInstance<TodoDto[]>(`/tasks`, {
           signal: meta.signal,
