@@ -22,5 +22,9 @@ export const useDeleteTodo = () => {
     },
   });
 
-  return { onDelete: deleteTodo.mutate, isPending: deleteTodo.isPending };
+  return {
+    onDelete: deleteTodo.mutate,
+    getIsPending: (id: string) =>
+      deleteTodo.isPending && deleteTodo.variables === id,
+  };
 };

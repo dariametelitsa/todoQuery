@@ -52,7 +52,7 @@ export function TodoList() {
               {task.text}
             </span>
             <button
-              disabled={deleteTodo.isPending}
+              disabled={deleteTodo.getIsPending(task.id)}
               onClick={() => deleteTodo.onDelete(task.id)}
               className={
                 'text-rose-500 font-bold px-1 rounded border border-pink-300 disabled:text-rose-300'
