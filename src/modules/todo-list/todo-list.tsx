@@ -1,27 +1,9 @@
 import { useTodolist } from './useTodolist.tsx';
-import * as React from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { todoListApi } from './api.ts';
-import { nanoid } from 'nanoid';
+import { useCreateTodo } from './useCreateTodo.ts';
 
 export function TodoList() {
-  const { error, refetch, isLoading, todoItems } = useTodolist();
-
-  const createTodo = useMutation({
-    mutationFn: todoListApi.createTodo,
-  });
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-
-    const title = String(formData.get('title') ?? '');
-    createTodo.mutate(
-      { id: nanoid(), done: false, userId: '1', text: title },
-      { onSuccess: () => refetch() }
-    );
-    e.currentTarget.reset();
-  };
+  const { error, isLoading, todoItems } = useTodolist();
+  const { handleSubmit } = useCreateTodo();
 
   if (isLoading) {
     return <h1>Loading...</h1>;
