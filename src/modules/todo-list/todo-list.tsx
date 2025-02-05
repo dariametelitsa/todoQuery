@@ -1,6 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { todoListApi } from './api.ts';
-import { useCallback, useRef, useState } from 'react';
+import { useState } from 'react';
+import { useIntersection } from '../../shared/hooks/useIntersection.ts';
 
 export function TodoList() {
   const [enabled, setEnabled] = useState(false);
@@ -16,12 +17,8 @@ export function TodoList() {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['tasks', 'list'],
-    queryFn: (meta) => todoListApi.getTodoList({ page: meta.pageParam }, meta),
-    initialPageParam: 1,
-    getNextPageParam: (res) => res.next,
+    ...todoListApi.getTodolistInfiniteQueryOptions(),
     enabled: enabled,
-    select: (result) => result.pages.map((page) => page.data).flat(),
   });
 
   const cursorRef = useIntersection(() => {
@@ -68,28 +65,5 @@ export function TodoList() {
         {isFetchingNextPage && <div>Loading...</div>}
       </div>
     </div>
-  );
-}
-
-export function useIntersection(onIntersect: () => void) {
-  const unsubscribe = useRef(() => {});
-
-  return useCallback(
-    (el: HTMLDivElement | null) => {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((intersection) => {
-          if (intersection.isIntersecting) {
-            onIntersect();
-          }
-        });
-      });
-      if (el) {
-        observer.observe(el);
-        unsubscribe.current = () => observer.disconnect();
-      } else {
-        unsubscribe.current();
-      }
-    },
-    [onIntersect]
   );
 }
