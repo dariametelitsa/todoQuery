@@ -6,17 +6,14 @@ class ApiError extends Error {
   }
 }
 
-export const jsonApiInstance =
-  <T>(url: string, init?: RequestInit) =>
-  async (meta: { signal?: AbortSignal }) => {
-    const result = await fetch(`${BASE_URL}${url}`, {
-      ...init,
-      signal: meta.signal,
-    });
+export const jsonApiInstance = async <T>(url: string, init?: RequestInit) => {
+  const result = await fetch(`${BASE_URL}${url}`, {
+    ...init,
+  });
 
-    if (!result.ok) {
-      throw new ApiError(result);
-    }
+  if (!result.ok) {
+    throw new ApiError(result);
+  }
 
-    return (await result.json()) as Promise<T>;
-  };
+  return (await result.json()) as Promise<T>;
+};
