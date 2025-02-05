@@ -1,11 +1,13 @@
 import { useTodolist } from './useTodolist.tsx';
 import { useCreateTodo } from './useCreateTodo.ts';
 import { useDeleteTodo } from './useDeleteTodo.ts';
+import { useToggleTodo } from './useToggleTodo.ts';
 
 export function TodoList() {
   const { error, isLoading, todoItems } = useTodolist();
   const createTodo = useCreateTodo();
   const deleteTodo = useDeleteTodo();
+  const { toggleTodo } = useToggleTodo();
 
   if (isLoading) {
     return <h1>Loading...</h1>;
@@ -48,6 +50,8 @@ export function TodoList() {
                 type={'checkbox'}
                 defaultChecked={task.done}
                 className={'mr-3'}
+                checked={task.done}
+                onChange={() => toggleTodo(task.id, task.done)}
               />
               {task.text}
             </span>

@@ -9,9 +9,7 @@ export const useCreateTodo = () => {
   const createTodo = useMutation({
     mutationFn: todoListApi.createTodo,
     onSettled: async () =>
-      await queryClient.invalidateQueries(
-        todoListApi.getTodolistQueryOptions()
-      ),
+      await queryClient.invalidateQueries({ queryKey: [todoListApi.baseKey] }),
   });
 
   const onCreate = (e: React.FormEvent<HTMLFormElement>) => {
